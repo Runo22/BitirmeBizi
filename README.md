@@ -1,2 +1,2 @@
-"# BitirmeBizi" 
+"# BitirmeBizi"\n 
 aga çalışacak inş
