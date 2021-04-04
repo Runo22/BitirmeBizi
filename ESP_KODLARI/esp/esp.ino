@@ -27,6 +27,7 @@ void setup()
     }
 
     // Setting IP Address to 192.168.1.200, you can change it as per your need, you also need to change IP in Flutter app too.
+    // Es ist Miami Yaccine onur benim Y***ramı yesin
 
     IPAddress ip(192, 168, 1, 200);
     IPAddress gateway(192, 168, 1, 1);
