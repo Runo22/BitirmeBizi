@@ -16,6 +16,7 @@ class _ControlPageState extends State<ControlPage> {
   String url;
   int direction = 0;
   Timer _milisectimer;
+  Duration twentyMillis; // bunu bura ekldeim sıkıntı olabilir ?? 
   static const milisec = const Duration(milliseconds: 100);
   // var _directionController = TextEditingController();
 
@@ -24,8 +25,7 @@ class _ControlPageState extends State<ControlPage> {
 
   double _speed = 0.0;
 
-  JoystickDirectionCallback onDirectionChanged(
-      double degrees, double distance) {
+  JoystickDirectionCallback onDirectionChanged(double degrees, double distance) {
     direction = _getdirection(degrees, distance);
     // _directionController.text = "Move: " + direction.toString();
 
@@ -59,7 +59,7 @@ class _ControlPageState extends State<ControlPage> {
 
   void _runmoved() async {
     if(_status == 'Not Connected'){//TODO burayı ileride aç sonra dispose dan cancel kodunu da aç
-      const twentyMillis = const Duration(seconds: 1); //TODO kullanıcaksan bunu en yukarıda tanımla
+      twentyMillis = const Duration(seconds: 1); //TODO kullanıcaksan bunu en yukarıda tanımla
       new Timer(twentyMillis, () => _runmoved());
     }
 
@@ -68,25 +68,23 @@ class _ControlPageState extends State<ControlPage> {
 
   void moved() async {
     print(
-        "Direction: ${direction.toString()}"); //, distance: ${distance.toStringAsFixed(2)}
+        "Direction: ${direction.toString()}\nSpeed: ${_speed.toInt().toString()}"); //, distance: ${distance.toStringAsFixed(2)}
 
     try {
-      response = await http.get(url + '${direction.toString()}',
+      response = await http.get(url + '${direction.toString()}' + '${_speed.toInt().toString()}',
           headers: {"Accept": "plain/text"});
       setState(() {
         _status = response.body;
         print(response.body);
       });
     } catch (e) {
-      // If NodeMCU is not connected, it will throw error
       print(e);
-      // displaySnackBar(context, 'Module Not Connected');
     }
   }
 
   @override
   void dispose() {
-    // twentyMillis.cancel();//TODO
+    // twentyMillis.cancel(); //buna gerek yok sanırım duration zaten bu 
     _milisectimer.cancel();
     super.dispose();
   }
@@ -126,23 +124,6 @@ class _ControlPageState extends State<ControlPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // Text(
-              //   "Status: Connected", //+ _status,
-              //   style: TextStyle(fontSize: 25.0),
-              // ),
-              // Text(
-              //   "IP: " + url,
-              //   style: TextStyle(fontSize: 25.0),
-              // ),
-              // Container(
-              //   width: 90,
-              //   child: TextField(
-              //     readOnly: true,
-              //     controller: _directionController,
-              //     style: TextStyle(fontSize: 25.0),
-              //   ),
-              // ),
-
               Image(
                 image: AssetImage(
                   'dur.png',
@@ -180,7 +161,7 @@ class _ControlPageState extends State<ControlPage> {
                     max: 4,
                     label: _speed.toInt().toString(),
                     onChanged: (newvalue) {
-                      setState(() => _speed = newvalue);
+                      setState(() => _speed = newvalue); //_speed değiştirmek için slider da 
                     },
                     divisions: 4,
                   ),
