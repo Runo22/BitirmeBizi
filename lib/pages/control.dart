@@ -26,12 +26,13 @@ class _ControlPageState extends State<ControlPage> {
   double _speed = 0.0;
 
   JoystickDirectionCallback onDirectionChanged(double degrees, double distance) {
-    direction = _getdirection(degrees, distance);
-    // _directionController.text = "Move: " + direction.toString();
+  direction = _getdirection(degrees, distance);
 
-    // print(
-    //     "degree: ${degrees.toStringAsFixed(2)}, Direction: ${direction.toString()}"); //, distance: ${distance.toStringAsFixed(2)}
-  }
+
+  print("Status: $_status");
+  print("Direction: ${direction.toString()}\nSpeed: ${_speed.toInt().toString()}"); 
+  //, distance: ${distance.toStringAsFixed(2)}
+}
 
   @override
   void initState() {
@@ -58,18 +59,16 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   void _runmoved() async {
-    if(_status == 'Not Connected'){//TODO burayı ileride aç sonra dispose dan cancel kodunu da aç
-      twentyMillis = const Duration(seconds: 1); //TODO kullanıcaksan bunu en yukarıda tanımla
+    if(_status == 'Not Connected'){                                 //TODO burayı ileride aç sonra dispose dan cancel kodunu da aç
+      twentyMillis = const Duration(seconds: 1);                    //TODO kullanıcaksan bunu en yukarıda tanımla
       new Timer(twentyMillis, () => _runmoved());
+    }else{
+      _milisectimer = new Timer.periodic(milisec, (Timer t) => moved());
     }
 
-    _milisectimer = new Timer.periodic(milisec, (Timer t) => moved());
   }
 
   void moved() async {
-    print(
-        "Direction: ${direction.toString()}\nSpeed: ${_speed.toInt().toString()}"); //, distance: ${distance.toStringAsFixed(2)}
-
     try {
       response = await http.get(url + '${direction.toString()}' + '${_speed.toInt().toString()}',
           headers: {"Accept": "plain/text"});
