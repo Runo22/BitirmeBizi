@@ -40,19 +40,10 @@ void setup()
 }
 
 void handle(){
-    char data[] = server.arg("value");
-    char * yon, hiz;
-
-    Serial.print("Gelen veri: ");
-    Serial.println(data);
-    yon = strtok (data,"#").toInt();
-    hiz = strtok (data,"#").toInt();           //araca gönderilen hedef hız
-
-    Serial.print("HIZ:");
-    Serial.println(hiz);
-    Serial.print("YON:");
-    Serial.print(yon);
-    Serial.print("**************");
+    resp = server.arg("value");
+    yon = resp.substring(0, 1).toInt();
+    //araca gönderilen hedef hız
+    hiz = resp.substring(1);
 
     switch (yon)
     {
@@ -81,27 +72,27 @@ void handle(){
 
 void dur(){
     server.send(200,"text/plain","dur");
-    // Serial.println("dur");
+    Serial.println("dur");
     //TODO motor dur kodu
 }
 void ileri(){
     server.send(200,"text/plain","ileri");
-    // Serial.println("ileri");
+    Serial.println("ileri");
     //TODO motor ileri kodu
 }
 void sol(){
     server.send(200,"text/plain","sol");
-    // Serial.println("sol");
+    Serial.println("sol");
     //TODO motor sol kodu
 }
 void geri(){
     server.send(200,"text/plain","geri");
-    // Serial.println("geri");
+    Serial.println("geri");
     //TODO motor geri kodu
 }
 void sag(){
     server.send(200,"text/plain","sag");
-    // Serial.println("sag");
+    Serial.println("sag");
     //TODO motor sag kodu
 }
 

@@ -78,7 +78,7 @@ class _ControlPageState extends State<ControlPage> {
 
   void moved() async {
     try {
-      response = await http.get(url + "update?value="+ '${direction.toString()}' + '${_speed.toInt().toString()}',
+      response = await http.get(url + "update?value="+ '${direction.toString()}' + "#" +'${_speed.toInt().toString()}',
           headers: {"Accept": "plain/text"});
       //TODO
       //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
