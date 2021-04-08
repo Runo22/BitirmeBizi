@@ -27,11 +27,6 @@ class _ControlPageState extends State<ControlPage> {
 
   JoystickDirectionCallback onDirectionChanged(double degrees, double distance) {
   direction = _getdirection(degrees, distance);
-
-
-  print("Status: $_status");
-  print("Direction: ${direction.toString()}\nSpeed: ${_speed.toInt().toString()}"); 
-  //, distance: ${distance.toStringAsFixed(2)}
 }
 
   @override
@@ -62,6 +57,9 @@ class _ControlPageState extends State<ControlPage> {
     if(_status == 'Not Connected'){                                 //TODO burayı ileride aç sonra dispose dan cancel kodunu da aç
       twentyMillis = const Duration(seconds: 1);                    //TODO kullanıcaksan bunu en yukarıda tanımla
       new Timer(twentyMillis, () => _runmoved());
+    }else if(direction == 0) {
+      dispose();
+      moved();
     }else{
       _milisectimer = new Timer.periodic(milisec, (Timer t) => moved());
     }
@@ -70,12 +68,13 @@ class _ControlPageState extends State<ControlPage> {
 
   void moved() async {
     try {
-      response = await http.get(url + '${direction.toString()}' + '${_speed.toInt().toString()}',
+      response = await http.get(url + "/update?value="+ '${direction.toString()}' + '${_speed.toInt().toString()}',
           headers: {"Accept": "plain/text"});
       setState(() {
         _status = response.body;
-        print(response.body);
       });
+      print("Status: ${_status.toString()}");
+      print("Speed: ${_speed.toString()}\nDirection: ${direction.toString()}");
     } catch (e) {
       print(e);
     }
@@ -176,7 +175,7 @@ class _ControlPageState extends State<ControlPage> {
                 backgroundColor: Colors.black54,
                 innerCircleColor: Colors.tealAccent[400],
                 size: 250,
-                // interval: Duration(milliseconds: 10), hata veriyo
+                // interval: Duration(milliseconds: 10),
               ),
 
               SizedBox(
@@ -189,8 +188,9 @@ class _ControlPageState extends State<ControlPage> {
                   ),
                   // height: 30,
                   minWidth: deviceWidth - 40,
-                  child: RaisedButton(
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),),
                     child: Text(
                       "OTONOM",
                       style: TextStyle(
