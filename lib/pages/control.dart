@@ -24,10 +24,11 @@ class _ControlPageState extends State<ControlPage> {
   var response;
 
   double _speed = 0.0;
+  bool zeroDirection = false;
 
   JoystickDirectionCallback onDirectionChanged(double degrees, double distance) {
-  direction = _getdirection(degrees, distance);
-}
+    _getdirection(degrees, distance);
+  }
 
   @override
   void initState() {
@@ -54,27 +55,38 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   void _runmoved() async {
-    if(_status == 'Not Connected'){                                 //TODO burayı ileride aç sonra dispose dan cancel kodunu da aç
-      twentyMillis = const Duration(seconds: 1);                    //TODO kullanıcaksan bunu en yukarıda tanımla
+    if(_status == 'Not Connected'){
+      twentyMillis = const Duration(seconds: 1);
       new Timer(twentyMillis, () => _runmoved());
-    }else if(direction == 0) {
-      dispose();
-      moved();
     }else{
-      _milisectimer = new Timer.periodic(milisec, (Timer t) => moved());
+      _milisectimer = new Timer.periodic(milisec, (Timer t) => premoved());
     }
+  }
 
+  void premoved(){  
+                  //? buna gerek olmayabilir(yukarda tanımlı bool)
+    if(zeroDirection == false){
+      moved();
+    }
+    if(direction == 0){
+      zeroDirection = true;
+    }
+    else{
+      zeroDirection = false;
+    }
   }
 
   void moved() async {
     try {
-      response = await http.get(url + "/update?value="+ '${direction.toString()}' + '${_speed.toInt().toString()}',
+      response = await http.get(url + "update?value="+ '${direction.toString()}' + '${_speed.toInt().toString()}',
           headers: {"Accept": "plain/text"});
-      setState(() {
-        _status = response.body;
-      });
+      //TODO
+      //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
+      //burada setstate erkranı yeniletiyo bunu bloc kullanarak yap
+      _status = response.body;
+
       print("Status: ${_status.toString()}");
-      print("Speed: ${_speed.toString()}\nDirection: ${direction.toString()}");
+      print("Speed: ${_speed.toInt().toString()}\nDirection: ${direction.toString()}");
     } catch (e) {
       print(e);
     }
@@ -82,7 +94,6 @@ class _ControlPageState extends State<ControlPage> {
 
   @override
   void dispose() {
-    // twentyMillis.cancel(); //buna gerek yok sanırım duration zaten bu 
     _milisectimer.cancel();
     super.dispose();
   }
@@ -104,7 +115,7 @@ class _ControlPageState extends State<ControlPage> {
                 Navigator.of(context).pop();
               }),
           title: Text(
-            _status,
+            "Kontrol Ekranı",
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -120,21 +131,25 @@ class _ControlPageState extends State<ControlPage> {
                 Color(0xFFdfecea),
               ])),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              SizedBox(
+                height: 50,
+              ),
+
               Image(
                 image: AssetImage(
                   'dur.png',
                 ),
-                height: 200,
-                width: 200,
+                height: 130, // * change
+                width: 130,
               ),
 
               SizedBox(
-                height: 50,
+                height: 15,
               ),
               Text(
-                'Anlık Hız: 20m/s',//TODO hızı yazdır 
+                'Anlık Hız: ${_speed.toInt().toString()}',
                 style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w800,
@@ -174,7 +189,7 @@ class _ControlPageState extends State<ControlPage> {
                 onDirectionChanged: onDirectionChanged,
                 backgroundColor: Colors.black54,
                 innerCircleColor: Colors.tealAccent[400],
-                size: 250,
+                size: 200,
                 // interval: Duration(milliseconds: 10),
               ),
 
@@ -209,7 +224,7 @@ class _ControlPageState extends State<ControlPage> {
         ));
   }
 
-  int _getdirection(double deg, double dis) {
+  void _getdirection(double deg, double dis) async{
     int val;
     if (dis < 0.25 || deg == 0) {
       val = 0;
@@ -228,6 +243,6 @@ class _ControlPageState extends State<ControlPage> {
     } else {
       val = 0; //"dur";
     }
-    return val;
+    direction = val;
   }
 }

@@ -16,6 +16,17 @@ class _ConnectPageState extends State<ConnectPage> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   IPData _data = new IPData();
 
+  TextEditingController _ipController;
+  TextEditingController _hostController;
+
+  @override //Gereksiz Silinebilir
+  void initState() {
+  _ipController = new TextEditingController(text: '192.168.1.200');
+  _hostController = new TextEditingController(text: '80');
+    super.initState();
+  }
+
+
   String _validateIP(String s) {
     if (s.contains(" ") || s.contains(",")) {
       return "Lütfen boşluk veya virgül kullanmayın.";
@@ -79,6 +90,7 @@ class _ConnectPageState extends State<ConnectPage> {
             child: Column(
               children: [
                 TextFormField(
+                  controller: _ipController,
                     keyboardType: TextInputType.number,
                     style: new TextStyle(
                       fontWeight: FontWeight.normal,
@@ -108,6 +120,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   height: 20,
                 ),
                 TextFormField(
+                    controller: _hostController,
                     keyboardType: TextInputType.number,
                     style: new TextStyle(
                       fontWeight: FontWeight.normal,
