@@ -55,8 +55,8 @@ void handle(){
 void handleOtonom(){
   Serial.print("O");
   if(Serial.available() > 0){
-    String otonomDurum = Serial.read();
-    if (otonomDurum == "77"){
+    int otonomDurum = Serial.read();
+    if (otonomDurum == 77){
       //otonom iş bitince bu alttaki gidicek
       server.send(200,"text/plain","ELLE");
     }

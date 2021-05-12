@@ -1,19 +1,19 @@
 // Motor A connections
-#define enA = 9;
-#define in1 = 8;
-#define in2 = 7;
+#define enA 9
+#define in1 8
+#define in2 7
 // Motor B connections
-#define enB = 3;
-#define in3 = 5;
-#define in4 = 4;
+#define enB 3
+#define in3 5
+#define in4 4
 
-String data, gelen, yonG, hizG;
+String data, gelen;
 int yon, hiz;
 
 //Otonom için
-#define echoPin 13;
-#define trigPin 12;
-long sure, uzaklık;
+#define echoPin 13
+#define trigPin 12
+long sure, uzaklik;
 int sagSol = 0;
 bool doesOtonom = false;
 
@@ -91,17 +91,17 @@ void loop() {
 
   // OTONOM SURUS KODLARI
   else if(doesOtonom == true){
-    //uzaklık sensoru olçum
+    //uzaklik sensoru olçum
     digitalWrite(trigPin, LOW);
     delayMicroseconds(5);
-    digitalWrite(trigPin,HIGH)
+    digitalWrite(trigPin,HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
   
     sure = pulseIn(echoPin, HIGH);
-    uzaklık = sure / 29.1 / 2;
+    uzaklik = sure / 29.1 / 2;
   
-    if(uzaklık < 15)    //TODO 
+    if(uzaklik < 15)    //TODO 
     {
       geri();
       delay(500);
