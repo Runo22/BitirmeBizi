@@ -44,7 +44,9 @@ class _ControlPageState extends State<ControlPage> {
 
   getInitLedState() async {
     try {
+      print("başla");
       response = await http.get(url, headers: {"Accept": "plain/text"});
+      print("geldi");
       setState(() {
         _status = 'Dur';
       });
