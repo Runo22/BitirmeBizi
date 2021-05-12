@@ -10,6 +10,13 @@
 String data, gelen, yonG, hizG;
 int yon, hiz;
 
+//Otonom için
+#define echoPin 13;
+#define trigPin 12;
+long sure, uzaklık;
+int sagSol = 0;
+bool doesOtonom = false;
+
 void setup() {
   Serial.begin(9600);
   
@@ -24,61 +31,103 @@ void setup() {
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
+
+  //otonom için
+  pinMode(echoPin,INPUT);
+  pinMode(trigPin,OUTPUT);
 }
 
-void loop() {
+
+void loop() { 
   if(Serial.available() > 0){
     gelen = Serial.read();
     data = data + gelen;
-    if(gelen == "10"){              //10 = Line feed
-      yonG = data.substring(0,2);
-      hizG = data.substring(2,4);
-      if(hizG != "13"){             //13 = Carriage return
-        hiz = hizG.toInt();
-        yon = yonG.toInt();
+    if(gelen == "42"){
+      yon = data.substring(0,2).toInt();
+      hiz = data.substring(2,4).toInt();
       }
-      data = "";  //?
+    else if(gelen == "79"){
+      doesOtonom = true;
+    }
+    data = "";  //?
+  }
+
+
+  // ELLE SURUS KODLARI
+  if(doesOtonom == false){
+    if(yon == 48){
+      Serial.print("dur - ");
+      Serial.println(hiz);
+      dur();
+    }
+    else if(yon == 49){
+      Serial.print("ileri - ");
+      Serial.println(hiz);
+      ileri();
+    }
+    
+    else if(yon == 50){
+      Serial.print("sol - ");
+      Serial.println(hiz);
+      sol();
+    }
+    else if(yon == 51){
+      Serial.print("geri - ");
+      Serial.println(hiz);
+      geri();
+    }
+    
+    else if(yon == 52){
+      Serial.print("sag - ");
+      Serial.println(hiz);
+      sag();
+    }
+    else{
+      Serial.print("def - ");
+      Serial.println(hiz);
+      dur();
     }
   }
 
-
-
+  // OTONOM SURUS KODLARI
+  else if(doesOtonom == true){
+    //uzaklık sensoru olçum
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(5);
+    digitalWrite(trigPin,HIGH)
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
   
-  if(yon == 48){
-    Serial.print("dur - ");
-    Serial.println(hiz);
-    dur();
-  }
-  else if(yon == 49){
-    Serial.print("ileri - ");
-    Serial.println(hiz);
-    ileri();
-  }
+    sure = pulseIn(echoPin, HIGH);
+    uzaklık = sure / 29.1 / 2;
   
-  else if(yon == 50){
-    Serial.print("sol - ");
-    Serial.println(hiz);
-    sol();
-  }
-  else if(yon == 51){
-    Serial.print("geri - ");
-    Serial.println(hiz);
-    geri();
-  }
-  
-  else if(yon == 52){
-    Serial.print("sag - ");
-    Serial.println(hiz);
-    sag();
-  }
-  else{
-    Serial.print("def - ");
-    Serial.println(hiz);
-    dur();
-  }
+    if(uzaklık < 15)    //TODO 
+    {
+      geri();
+      delay(500);
+      if(sagSol = 1)
+      {
+        sol();
+        delay(500);
+        sagSol = 0;
+        doesOtonom = false;
+        Serial.print("M");
+      }
+      else{
+        sag();
+        delay(500);
+        sagSol = 1; 
+      } 
+    }
+    else{
+      ileri();
+    }
+  } 
 }
 
 
+
+//MOTOR kontrol kodları
 void dur(){
   digitalWrite(in1, LOW);
   digitalWrite(in2, LOW);
@@ -119,7 +168,7 @@ void sag(){
 }
 
 void yavasla(){
-  
+  //TODO
     
   
   

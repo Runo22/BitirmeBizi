@@ -49,13 +49,14 @@ void handle(){
   server.send(200,"text/plain","CONNECTED");
     resp = server.arg("value");
     //veri = resp.substring(0,2).toInt();
-    Serial.println(resp);
+    Serial.print(resp + "*");                   // * = 42 ascii
 }
 
 void handleOtonom(){
+  Serial.print("O");
   if(Serial.available() > 0){
     String otonomDurum = Serial.read();
-    if (otonomDurum == "ELLE"){
+    if (otonomDurum == "77"){
       //otonom iş bitince bu alttaki gidicek
       server.send(200,"text/plain","ELLE");
     }

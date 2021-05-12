@@ -178,10 +178,10 @@ class _ControlPageState extends State<ControlPage> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 10,
+                            height: 20,
                           ),
                           Text(
-                            'Hedefe Gidiliyor ...',
+                            'Hedefe Gidiliyor',
                             style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w800,
@@ -202,7 +202,7 @@ class _ControlPageState extends State<ControlPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                           SizedBox(
-                            height: 15,
+                            height: 20,
                           ),
                           Text(
                             'Anlık Hız: ${(_speed * 55).toInt().toString()}',
@@ -255,7 +255,7 @@ class _ControlPageState extends State<ControlPage> {
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     primary: _doesOtonom ? Colors.red : Colors.blue,
-                    padding: EdgeInsets.fromLTRB(80, 13, 80, 13),
+                    padding: EdgeInsets.fromLTRB(80, 14, 80, 14),
                     shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15.0),
                     ),
@@ -264,7 +264,7 @@ class _ControlPageState extends State<ControlPage> {
                     _doesOtonom ? "DUR" : "OTONOM",
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 30,
+                        fontSize: 22,
                         fontWeight:
                             FontWeight.bold), // minWidth: deviceWidth - 40,
                   ),
