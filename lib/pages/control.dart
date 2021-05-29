@@ -17,9 +17,8 @@ class _ControlPageState extends State<ControlPage> {
   String url;
   int direction = 0;
   Timer _milisectimer;
-  Duration twentyMillis; // bunu bura ekldeim sıkıntı olabilir ??
+  Duration twentyMillis;
   static const milisec = const Duration(milliseconds: 100);
-  // var _directionController = TextEditingController();
 
   String _status = 'Not Connected';
   var response, responseOtonom;
@@ -28,6 +27,10 @@ class _ControlPageState extends State<ControlPage> {
   bool zeroDirection = false;
 
   bool _doesOtonom = false;
+  bool _isYavas = false;
+  
+  var durumListesi = ['yavas.png', 'okul.png', 'hayvan.png'];
+  String randomItem; 
 
   JoystickDirectionCallback onDirectionChanged(
       double degrees, double distance) {
@@ -44,9 +47,7 @@ class _ControlPageState extends State<ControlPage> {
 
   getInitLedState() async {
     try {
-      print("başla");
       response = await http.get(url, headers: {"Accept": "plain/text"});
-      print("geldi");
       setState(() {
         _status = 'Dur';
       });
@@ -74,6 +75,11 @@ class _ControlPageState extends State<ControlPage> {
     if (zeroDirection == false) {
       moved();
     }
+    //otonom cevap beklerken kontrolü için
+    else if (_doesOtonom == true) {
+      moved();
+    }
+
     if (direction == 0) {
       zeroDirection = true;
     } else {
@@ -84,25 +90,31 @@ class _ControlPageState extends State<ControlPage> {
   void moved() async {
     //ELLE KONTROL
     if (_doesOtonom == false) {
+      if (_isYavas == true) {
+        if(_speed != 0.0){
+          _speed = 1.0;
+        }
+      }
       try {
         response = await http.get(
             url +
                 "update?value=" +
-                '${direction.toString()}' +
-                "#" +
-                '${_speed.toInt().toString()}',
+                "${direction.toString()}#${_speed.toInt().toString()}",
             headers: {"Accept": "plain/text"});
-        //TODO
         //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
         //burada setstate erkranı yeniletiyo bunu bloc kullanarak yap
         _status = response.body;
-
-        print("Status: ${_status.toString()}");
-        print(
-            "Speed: ${_speed.toInt().toString()}\nDirection: ${direction.toString()}");
+        if (_status == "yavas") {
+          randomItem = (durumListesi..shuffle()).first;
+          _isYavas = true;
+          Future.delayed(Duration(seconds: 2), () {
+            _isYavas = false;
+            print("---YAVAS KODU BITTI---");
+          });
+        }
       } catch (e) {
         print(e);
-      }
+      } 
     }
 
     //OTONOM KONTROL
@@ -114,7 +126,7 @@ class _ControlPageState extends State<ControlPage> {
       } catch (e) {
         print(e);
       }
-      if(_status == "ELLE"){
+      if (_status == "ELLE") {
         setState(() {
           _doesOtonom = false;
         });
@@ -169,7 +181,9 @@ class _ControlPageState extends State<ControlPage> {
               Image(
                 // TODO
                 image: AssetImage(
-                  'dur.png',
+                  _isYavas 
+                  ?randomItem
+                  :'ytu.png'
                 ),
                 height: 130, // * change
                 width: 130,

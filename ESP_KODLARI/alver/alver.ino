@@ -49,7 +49,7 @@ void handle(){
   server.send(200,"text/plain","CONNECTED");
     resp = server.arg("value");
     //veri = resp.substring(0,2).toInt();
-    Serial.print(resp + "*");                   // * = 42 ascii
+    Serial.print(resp);                   // * = 42 ascii
 }
 
 void handleOtonom(){

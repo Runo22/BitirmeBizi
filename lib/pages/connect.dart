@@ -22,7 +22,7 @@ class _ConnectPageState extends State<ConnectPage> {
 
   @override //Gereksiz Silinebilir
   void initState() {
-    _ipController = new TextEditingController(text: '192.168.1.200');
+    _ipController = new TextEditingController(text: '192.97.1.200');
     _hostController = new TextEditingController(text: '80');
     super.initState();
   }
