@@ -25,13 +25,12 @@ class _ControlPageState extends State<ControlPage> {
 
   double _speed = 0.0;
   bool sameDirection = false;
-  
 
   bool _doesOtonom = false;
   bool _isYavas = false;
-  
+
   var durumListesi = ['yavas.png', 'okul.png', 'hayvan.png'];
-  String randomItem; 
+  String randomItem;
 
   JoystickDirectionCallback onDirectionChanged(
       double degrees, double distance) {
@@ -71,7 +70,6 @@ class _ControlPageState extends State<ControlPage> {
     }
   }
 
-
   void premoved() {
     //? buna gerek olmayabilir(yukarda tanımlı bool)
     if (direction == lastdiretion) {
@@ -94,7 +92,7 @@ class _ControlPageState extends State<ControlPage> {
     //ELLE KONTROL
     if (_doesOtonom == false) {
       if (_isYavas == true) {
-        if(_speed != 0.0){
+        if (_speed != 0.0) {
           _speed = 1.0;
         }
       }
@@ -107,7 +105,7 @@ class _ControlPageState extends State<ControlPage> {
         //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
         //burada setstate erkranı yeniletiyo bunu bloc kullanarak yap
         _status = response.body;
-        
+
         if (_status == "yavas") {
           randomItem = (durumListesi..shuffle()).first;
           _isYavas = true;
@@ -118,7 +116,7 @@ class _ControlPageState extends State<ControlPage> {
         }
       } catch (e) {
         print(e);
-      } 
+      }
     }
 
     //OTONOM KONTROL
@@ -184,11 +182,7 @@ class _ControlPageState extends State<ControlPage> {
               ),
               Image(
                 // TODO
-                image: AssetImage(
-                  _isYavas 
-                  ?randomItem
-                  :'ytu.png'
-                ),
+                image: AssetImage(_isYavas ? randomItem : 'ytu.png'),
                 height: 130, // * change
                 width: 130,
               ),
@@ -289,9 +283,16 @@ class _ControlPageState extends State<ControlPage> {
                             FontWeight.bold), // minWidth: deviceWidth - 40,
                   ),
                   onPressed: () {
-                    setState(() {
-                      _doesOtonom = !_doesOtonom;
-                    });
+                    if (_doesOtonom == false) {
+                      setState(() {
+                        _doesOtonom = true;
+                      });
+                    } else if (_doesOtonom == true) {
+                      moved();
+                      setState(() {
+                        _doesOtonom = false;
+                      });
+                    }
                   }),
             ],
           ),
