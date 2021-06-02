@@ -18,13 +18,13 @@ IPAddress subnet(255, 255, 255, 0);
 ESP8266WebServer server(80);
 
 String  resp;
-bool isYavas = false;
+int isYavas = 0;
 
 
-//void handleRoot()   //TODO DEL:GEREKSİZ SANIRIM
-//{
-//    server.send(200, "text/html", "You are connected");
-//}
+void handleRoot()
+{
+    server.send(200, "text/html", "You are connected");
+}
 
 void setup() {
   Serial.begin(9600);
@@ -46,15 +46,14 @@ void setup() {
 }
 
 void handle(){
-  if(isYavas == true){
-    server.send(200,"text/plain","yavas");
-    isYavas == false;
-  }else{
-    server.send(200,"text/plain","CONNECTED"); 
-  }
-  resp = server.arg("value");
-  //veri = resp.substring(0,2).toInt();
-  Serial.print(resp + "*");                   // * = 42 ascii
+  server.send(200,"text/plain","CONNECTED");
+    resp = server.arg("value");
+    if(isYavas = 1){
+      resp = resp.substring(0,1) + "1";
+      }
+    //else if(is
+    //veri = resp.substring(0,2).toInt();
+    Serial.print(resp + "*");                   // * = 42 ascii
 }
 
 void handleOtonom(){
@@ -66,8 +65,8 @@ void handleOtonom(){
       server.send(200,"text/plain","ELLE");
     }
     else{
-      server.send(200,"text/plain","CONNECTED");
-    }
+        server.send(200,"text/plain","OTONOM");
+      }
   }
   delay(1);   //??????
 }
@@ -90,16 +89,26 @@ void readKey(){
    rfid.uid.uidByte[1] == ID[1] &&
    rfid.uid.uidByte[2] == ID[2] &&
    rfid.uid.uidByte[3] == ID[3]){
-    //okuduğu zaman listeden random durum seçip uygulmaaya gönderilecek.
-//    Serial.println("YAVAŞ!!!");
-    //burdan uygulamay veri gönderilecek 
-    //uygulmadan t sniye boyunca hız 1 olacak
-    //ve yavaşla işareti çıkacak
-    isYavas = true;
+    Serial.println("YAVAŞ!!!");
+    isYavas = 1;
+    printKey();
+    delay(1000);
+    isYavas = 0;
     }
-//   else{
-//    Serial.print("Yetkisiz KART!!!");
-//    }   
+   else{
+    Serial.print("Yetkisiz KART!!!");
+    printKey();
+    }   
    rfid.PICC_HaltA();
   }
   
+void printKey(){
+  Serial.print("ID numarası: ");
+  for(int i = 0; i < 4; i++){
+    Serial.print(rfid.uid.uidByte[i]);
+    Serial.print(" ");
+    }
+   Serial.println(" ");
+  }
+
+

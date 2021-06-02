@@ -43,7 +43,8 @@ void loop() {
     gelen = Serial.read();
     data = data + gelen;
     //Serial.print(data);
-    if(gelen == "42"){  // 42 => * 
+    if(gelen == "42"){
+      //Serial.print("Konyalı mısın?");
       yon = data.substring(0,2);
       hiz = data.substring(2,4).toInt();
       Serial.print(yon);

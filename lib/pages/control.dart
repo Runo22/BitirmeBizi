@@ -15,16 +15,17 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPageState extends State<ControlPage> {
   String url;
-  int direction = 0;
+  int direction, lastdiretion = 0;
   Timer _milisectimer;
   Duration twentyMillis;
-  static const milisec = const Duration(milliseconds: 100);
+  static const milisec = const Duration(milliseconds: 100); //send data interval
 
   String _status = 'Not Connected';
   var response, responseOtonom;
 
   double _speed = 0.0;
-  bool zeroDirection = false;
+  bool sameDirection = false;
+  
 
   bool _doesOtonom = false;
   bool _isYavas = false;
@@ -70,20 +71,22 @@ class _ControlPageState extends State<ControlPage> {
     }
   }
 
+
   void premoved() {
     //? buna gerek olmayabilir(yukarda tanımlı bool)
-    if (zeroDirection == false) {
+    if (direction == lastdiretion) {
+      sameDirection = true;
+    } else {
+      sameDirection = false;
+    }
+    lastdiretion = direction;
+
+    if (sameDirection == false) {
       moved();
     }
     //otonom cevap beklerken kontrolü için
     else if (_doesOtonom == true) {
       moved();
-    }
-
-    if (direction == 0) {
-      zeroDirection = true;
-    } else {
-      zeroDirection = false;
     }
   }
 
@@ -99,11 +102,12 @@ class _ControlPageState extends State<ControlPage> {
         response = await http.get(
             url +
                 "update?value=" +
-                "${direction.toString()}#${_speed.toInt().toString()}",
+                "${direction.toString()}${_speed.toInt().toString()}",
             headers: {"Accept": "plain/text"});
         //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
         //burada setstate erkranı yeniletiyo bunu bloc kullanarak yap
         _status = response.body;
+        
         if (_status == "yavas") {
           randomItem = (durumListesi..shuffle()).first;
           _isYavas = true;
