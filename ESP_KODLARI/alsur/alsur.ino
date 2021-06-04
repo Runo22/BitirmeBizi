@@ -58,6 +58,7 @@ void loop() {
 
    //ELLE SURUS KODLARI
   if(doesOtonom == false){
+    checkSpeed();
     if(yon == "48"){
       Serial.print("dur - ");
       Serial.println(hiz);
@@ -169,3 +170,16 @@ void sag(){
   digitalWrite(in3, LOW);    
   digitalWrite(in4, LOW);
 }
+
+int checkSpeed(){
+  if(hiz == 48){
+    hiz = 0;
+    }
+    else if(hiz == 49){
+    hiz = 126;
+    }
+    else if(hiz == 50){
+    hiz = 255;
+    }
+    return hiz;
+  }
