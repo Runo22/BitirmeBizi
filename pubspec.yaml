@@ -1,5 +1,5 @@
 name: esp_control
-description: A new Flutter project.
+description: Bitirme projesi telefon uygulaması
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -44,8 +44,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - dur.png
+    - yavas.png
+    - okul.png
+    - hayvan.png
     - car.flr
+    - ytu.png
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

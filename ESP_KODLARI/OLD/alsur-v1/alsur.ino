@@ -7,8 +7,8 @@
 #define in3 5
 #define in4 4
 
-String data, gelen, yon;
-int hiz;
+String data, gelen;
+int yon, hiz;
 
 //Otonom için
 #define echoPin 13
@@ -42,91 +42,87 @@ void loop() {
   if(Serial.available() > 0){
     gelen = Serial.read();
     data = data + gelen;
-    //Serial.print(data);
-    if(gelen == "42"){  // 42 => * 
-      yon = data.substring(0,2);
+    if(gelen == "42"){
+      yon = data.substring(0,2).toInt();
       hiz = data.substring(2,4).toInt();
-      Serial.print(yon);
-      Serial.print(hiz);
-      data = "";
       }
     else if(gelen == "79"){
       doesOtonom = true;
     }
+    data = "";  //?
   }
 
 
-   //ELLE SURUS KODLARI
+  // ELLE SURUS KODLARI
   if(doesOtonom == false){
-    checkSpeed();
-    if(yon == "48"){
+    if(yon == 48){
       Serial.print("dur - ");
       Serial.println(hiz);
       dur();
     }
-    else if(yon == "49"){
+    else if(yon == 49){
       Serial.print("ileri - ");
       Serial.println(hiz);
       ileri();
     }
     
-    else if(yon == "50"){
+    else if(yon == 50){
       Serial.print("sol - ");
       Serial.println(hiz);
       sol();
     }
-    else if(yon == "51"){
+    else if(yon == 51){
       Serial.print("geri - ");
       Serial.println(hiz);
       geri();
     }
     
-    else if(yon == "52"){
+    else if(yon == 52){
       Serial.print("sag - ");
       Serial.println(hiz);
       sag();
     }
-//    else{
-//      Serial.print("Sokacam calıs");
-//      dur();
-//    }
+    else{
+      Serial.print("def - ");
+      Serial.println(hiz);
+      dur();
+    }
   }
 
   // OTONOM SURUS KODLARI
-    else if(doesOtonom == true){
-      //uzaklık sensoru olçum
-      digitalWrite(trigPin, LOW);
-      delayMicroseconds(5);
-      digitalWrite(trigPin,HIGH);
-      delayMicroseconds(10);
-      digitalWrite(trigPin, LOW);
-    
-      sure = pulseIn(echoPin, HIGH);
-      uzaklik = sure / 29.1 / 2;
-    
-      if(uzaklik < 15)    //TODO 
+  else if(doesOtonom == true){
+    //uzaklik sensoru olçum
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(5);
+    digitalWrite(trigPin,HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+  
+    sure = pulseIn(echoPin, HIGH);
+    uzaklik = sure / 29.1 / 2;
+  
+    if(uzaklik < 15)    //TODO 
+    {
+      geri();
+      delay(500);
+      if(sagSol = 1)
       {
-        geri();
+        sol();
         delay(500);
-        if(sagSol = 1)
-        {
-          sol();
-          delay(500);
-          sagSol = 0;
-          doesOtonom = false;
-          Serial.print("M");
-        }
-        else{
-          sag();
-          delay(500);
-          sagSol = 1; 
-        } 
+        sagSol = 0;
+        doesOtonom = false;
+        Serial.print("M");
       }
       else{
-        ileri();
-      }
-    } 
-    Serial.println("Gitti galiba");
+        sag();
+        delay(500);
+        sagSol = 1; 
+      } 
+    }
+    else{
+      ileri();
+    }
+  } 
 }
 
 
@@ -171,15 +167,9 @@ void sag(){
   digitalWrite(in4, LOW);
 }
 
-int checkSpeed(){
-  if(hiz == 48){
-    hiz = 0;
-    }
-    else if(hiz == 49){
-    hiz = 126;
-    }
-    else if(hiz == 50){
-    hiz = 255;
-    }
-    return hiz;
+void yavasla(){
+  //TODO
+    
+  
+  
   }

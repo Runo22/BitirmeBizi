@@ -43,7 +43,8 @@ void loop() {
     gelen = Serial.read();
     data = data + gelen;
     //Serial.print(data);
-    if(gelen == "42"){  // 42 => * 
+    if(gelen == "42"){
+      //Serial.print("Konyalı mısın?");
       yon = data.substring(0,2);
       hiz = data.substring(2,4).toInt();
       Serial.print(yon);
@@ -58,7 +59,6 @@ void loop() {
 
    //ELLE SURUS KODLARI
   if(doesOtonom == false){
-    checkSpeed();
     if(yon == "48"){
       Serial.print("dur - ");
       Serial.println(hiz);
@@ -170,16 +170,3 @@ void sag(){
   digitalWrite(in3, LOW);    
   digitalWrite(in4, LOW);
 }
-
-int checkSpeed(){
-  if(hiz == 48){
-    hiz = 0;
-    }
-    else if(hiz == 49){
-    hiz = 126;
-    }
-    else if(hiz == 50){
-    hiz = 255;
-    }
-    return hiz;
-  }

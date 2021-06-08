@@ -15,19 +15,22 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPageState extends State<ControlPage> {
   String url;
-  int direction = 0;
+  int direction, lastdiretion = 0;
   Timer _milisectimer;
-  Duration twentyMillis; // bunu bura ekldeim sıkıntı olabilir ??
-  static const milisec = const Duration(milliseconds: 100);
-  // var _directionController = TextEditingController();
+  Duration twentyMillis;
+  static const milisec = const Duration(milliseconds: 100); //send data interval
 
   String _status = 'Not Connected';
   var response, responseOtonom;
 
   double _speed = 0.0;
-  bool zeroDirection = false;
+  bool sameDirection = false;
 
   bool _doesOtonom = false;
+  bool _isYavas = false;
+
+  var durumListesi = ['yavas.png', 'okul.png', 'hayvan.png'];
+  String randomItem;
 
   JoystickDirectionCallback onDirectionChanged(
       double degrees, double distance) {
@@ -69,35 +72,48 @@ class _ControlPageState extends State<ControlPage> {
 
   void premoved() {
     //? buna gerek olmayabilir(yukarda tanımlı bool)
-    if (zeroDirection == false) {
+    if (direction == lastdiretion) {
+      sameDirection = true;
+    } else {
+      sameDirection = false;
+    }
+    lastdiretion = direction;
+
+    if (sameDirection == false) {
       moved();
     }
-    if (direction == 0) {
-      zeroDirection = true;
-    } else {
-      zeroDirection = false;
+    //otonom cevap beklerken kontrolü için
+    else if (_doesOtonom == true) {
+      moved();
     }
   }
 
   void moved() async {
     //ELLE KONTROL
     if (_doesOtonom == false) {
+      if (_isYavas == true) {
+        if (_speed != 0.0) {
+          _speed = 1.0;
+        }
+      }
       try {
         response = await http.get(
             url +
                 "update?value=" +
-                '${direction.toString()}' +
-                "#" +
-                '${_speed.toInt().toString()}',
+                "${direction.toString()}${_speed.toInt().toString()}",
             headers: {"Accept": "plain/text"});
-        //TODO
         //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
         //burada setstate erkranı yeniletiyo bunu bloc kullanarak yap
         _status = response.body;
 
-        print("Status: ${_status.toString()}");
-        print(
-            "Speed: ${_speed.toInt().toString()}\nDirection: ${direction.toString()}");
+        if (_status == "yavas") {
+          randomItem = (durumListesi..shuffle()).first;
+          _isYavas = true;
+          Future.delayed(Duration(seconds: 2), () {
+            _isYavas = false;
+            print("---YAVAS KODU BITTI---");
+          });
+        }
       } catch (e) {
         print(e);
       }
@@ -112,7 +128,7 @@ class _ControlPageState extends State<ControlPage> {
       } catch (e) {
         print(e);
       }
-      if(_status == "ELLE"){
+      if (_status == "ELLE") {
         setState(() {
           _doesOtonom = false;
         });
@@ -166,9 +182,7 @@ class _ControlPageState extends State<ControlPage> {
               ),
               Image(
                 // TODO
-                image: AssetImage(
-                  'dur.png',
-                ),
+                image: AssetImage(_isYavas ? randomItem : 'ytu.png'),
                 height: 130, // * change
                 width: 130,
               ),
@@ -178,10 +192,10 @@ class _ControlPageState extends State<ControlPage> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 10,
+                            height: 20,
                           ),
                           Text(
-                            'Hedefe Gidiliyor ...',
+                            'Hedefe Gidiliyor',
                             style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w800,
@@ -202,7 +216,7 @@ class _ControlPageState extends State<ControlPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                           SizedBox(
-                            height: 15,
+                            height: 20,
                           ),
                           Text(
                             'Anlık Hız: ${(_speed * 55).toInt().toString()}',
@@ -255,7 +269,7 @@ class _ControlPageState extends State<ControlPage> {
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     primary: _doesOtonom ? Colors.red : Colors.blue,
-                    padding: EdgeInsets.fromLTRB(80, 13, 80, 13),
+                    padding: EdgeInsets.fromLTRB(80, 14, 80, 14),
                     shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15.0),
                     ),
@@ -264,14 +278,21 @@ class _ControlPageState extends State<ControlPage> {
                     _doesOtonom ? "DUR" : "OTONOM",
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 30,
+                        fontSize: 22,
                         fontWeight:
                             FontWeight.bold), // minWidth: deviceWidth - 40,
                   ),
                   onPressed: () {
-                    setState(() {
-                      _doesOtonom = !_doesOtonom;
-                    });
+                    if (_doesOtonom == false) {
+                      setState(() {
+                        _doesOtonom = true;
+                      });
+                    } else if (_doesOtonom == true) {
+                      moved();
+                      setState(() {
+                        _doesOtonom = false;
+                      });
+                    }
                   }),
             ],
           ),

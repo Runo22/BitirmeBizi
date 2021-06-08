@@ -18,14 +18,14 @@ class _ConnectPageState extends State<ConnectPage> {
 
   TextEditingController _ipController;
   TextEditingController _hostController;
+  double deviceHeight;
 
   @override //Gereksiz Silinebilir
   void initState() {
-  _ipController = new TextEditingController(text: '192.168.1.200');
-  _hostController = new TextEditingController(text: '80');
+    _ipController = new TextEditingController(text: '192.97.1.200');
+    _hostController = new TextEditingController(text: '80');
     super.initState();
   }
-
 
   String _validateIP(String s) {
     if (s.contains(" ") || s.contains(",")) {
@@ -64,18 +64,21 @@ class _ConnectPageState extends State<ConnectPage> {
   void submit() {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save();
-
-      print('Printing the login data.');
-      print('Email: ${_data.ip}');
-      print('Password: ${_data.port}');
+      // print('Printing the login data.');
+      // print('Email: ${_data.ip}');
+      // print('Password: ${_data.port}');
+      // print(deviceHeight.toString());
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      //klavye açılınca overflow olmasın diye
+      resizeToAvoidBottomInset: false,
       body: Container(
-        padding: EdgeInsets.only(top: 250, left: 45, right: 45),
+        padding: EdgeInsets.only(top: deviceHeight/6.5, left: 45, right: 45),
         // color: Colors.amber[200],
         decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -89,8 +92,18 @@ class _ConnectPageState extends State<ConnectPage> {
             key: _formKey,
             child: Column(
               children: [
+                Image(
+                  image: AssetImage(
+                    'ytu.png',
+                  ),
+                  height: deviceHeight/3.7, // * change
+                  width: deviceHeight/3.7,
+                ),
+                SizedBox(
+                  height: deviceHeight/18,
+                ),
                 TextFormField(
-                  controller: _ipController,
+                    controller: _ipController,
                     keyboardType: TextInputType.number,
                     style: new TextStyle(
                       fontWeight: FontWeight.normal,
@@ -117,7 +130,7 @@ class _ConnectPageState extends State<ConnectPage> {
                                   )));
                     }),
                 SizedBox(
-                  height: 20,
+                  height: deviceHeight/43,
                 ),
                 TextFormField(
                     controller: _hostController,
@@ -138,79 +151,28 @@ class _ConnectPageState extends State<ConnectPage> {
                       this._data.port = value;
                     }),
                 SizedBox(
-                  height: 90,
+                  height: deviceHeight/9.5,
                 ),
-                ButtonTheme(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                        // side: BorderSide(color: Colors.red)
-                        ),
-                    height: 60,
-                    minWidth: 180,
-                    child: RaisedButton(
-                      child: Text(
-                        "BAĞLAN",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      onPressed: () => this.submit(),
-                    )),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.fromLTRB(80, 15, 80, 15),
+                    shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(15.0),
+                    ),
+                  ),
+                  child: Text(
+                    "BAĞLAN",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight:
+                            FontWeight.bold),
+                  ),
+                  onPressed: () => this.submit(),
+                ),
               ],
             )),
       ),
     );
-
-    // return new Scaffold(
-    //   // backgroundColor: Color.fromRGBO(255, 255, 255, 0.95),
-    //   appBar: new AppBar(
-    //     // backgroundColor: Colors.black45,
-    //     title: new Text('Login'),
-    //     centerTitle: true,
-    //   ),
-    //   body: new Container(
-    //       padding: new EdgeInsets.all(20.0),
-    //       child: new Form(
-    //         key: this._formKey,
-    //         child: new ListView(
-    //           children: <Widget>[
-    //             new SizedBox(
-    //               height: 80,
-    //             ),
-    //             new TextFormField(
-    //                 keyboardType: TextInputType.number,
-    //                 decoration: new InputDecoration(
-    //                     hintText: '192.168.1.2', labelText: 'Ip Adres'),
-    //                 validator: this._validateIP,
-    //                 onSaved: (String value) {
-    //                   this._data.ip = value;
-    //                   print(_data.ip + ":" + _data.port);
-    //                   Navigator.push(
-    //                       context,
-    //                       MaterialPageRoute(
-    //                           builder: (BuildContext context) => ControlPage(
-    //                                 furl: this._data.ip + ":" + this._data.port,
-    //                               )));
-    //                 }),
-    //             new TextFormField(
-    //                 keyboardType: TextInputType.number,
-    //                 decoration: new InputDecoration(
-    //                     hintText: '80', labelText: 'Host numrası'),
-    //                 validator: this._validatePort,
-    //                 onSaved: (String value) {
-    //                   this._data.port = value;
-    //                 }),
-    //             new SizedBox(
-    //               height: 40,
-    //             ),
-    //             new FloatingActionButton(
-    //               child: new Icon(Icons.navigate_next),
-    //               onPressed: this.submit,
-    //             )
-    //           ],
-    //         ),
-    //       )),
-    // );
   }
 }
