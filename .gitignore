@@ -41,5 +41,7 @@ app.*.symbols
 app.*.map.json
 
 
-#benim eklediklerim
-ESP_KODLARI/esp_led.ino
+#eski kodlar ve gereksizler
+ESP_KODLARI/OLD/
+.metadata
+pubspec.lock
