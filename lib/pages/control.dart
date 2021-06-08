@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:control_pad/control_pad.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animations/loading_animations.dart';
 
 BuildContext scaffoldContext;
 
@@ -10,7 +12,9 @@ class ControlPage extends StatefulWidget {
   @override
   _ControlPageState createState() => _ControlPageState();
   final String furl;
-  ControlPage({Key key, @required this.furl}) : super(key: key);
+  final String ssehir;
+  ControlPage({Key key, @required this.furl, @required this.ssehir})
+      : super(key: key);
 }
 
 class _ControlPageState extends State<ControlPage> {
@@ -18,19 +22,25 @@ class _ControlPageState extends State<ControlPage> {
   int direction, lastdiretion = 0;
   Timer _milisectimer;
   Duration twentyMillis;
-  static const milisec = const Duration(milliseconds: 100); //send data interval
+  static const milisec = const Duration(milliseconds: 100); //veri gonderme araligi
 
   String _status = 'Not Connected';
   var response, responseOtonom;
 
   double _speed = 0.0;
   bool sameDirection = false;
-
   bool _doesOtonom = false;
   bool _isYavas = false;
-
-  var durumListesi = ['yavas.png', 'okul.png', 'hayvan.png'];
   String randomItem;
+  var durumListesi = ['yavas.png', 'okul.png', 'hayvan.png'];
+
+  String _sehir = 'anchorage';
+  int _woeid;
+  String _weather = 'clear';
+  String lokasyonApiURL =
+      'https://www.metaweather.com/api/location/search/?query=';
+  String weatherApiUrl = 'https://www.metaweather.com/api/location/';
+  bool havaYet = false;
 
   JoystickDirectionCallback onDirectionChanged(
       double degrees, double distance) {
@@ -39,10 +49,43 @@ class _ControlPageState extends State<ControlPage> {
 
   @override
   void initState() {
+    _sehir = widget.ssehir;
+    getSehir();
     url = 'http://${widget.furl}/';
-    super.initState();
     getInitLedState();
     _runmoved();
+    super.initState();
+  }
+
+  void getSehir() async {
+    var gelen = await http.get(lokasyonApiURL + _sehir);
+    var veri = json.decode(gelen.body)[0];
+
+    _sehir = veri["title"];
+    _woeid = veri["woeid"];
+    getHavaDurumu();
+  }
+
+  void getHavaDurumu() async {
+    var gelen = await http.get(weatherApiUrl + _woeid.toString());
+    var veriler = json.decode(gelen.body);
+    var veri = veriler["consolidated_weather"][0];
+
+    setState(() {
+      _weather = veri["weather_state_name"].replaceAll(' ', '').toLowerCase();
+      print(_weather);
+      //hava verisi gelince sürüş ekranı göstermek için true oluyor
+      havaYet = true;
+    });
+  }
+
+  void checkHava() {
+    var havaList = ['hail', 'heavyrain', 'snow'];
+    if (havaList.contains(_weather)) {
+      if (_speed != 0.0) {
+        _speed = 1.0;
+      }
+    }
   }
 
   getInitLedState() async {
@@ -89,6 +132,8 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   void moved() async {
+    //hava durumuna göre hızı yavaşlatma kodu
+    checkHava();
     //ELLE KONTROL
     if (_doesOtonom == false) {
       if (_isYavas == true) {
@@ -150,7 +195,7 @@ class _ControlPageState extends State<ControlPage> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black45,
+          backgroundColor: Colors.orange, //Colors.black45,
           leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_sharp, color: Colors.white),
               tooltip: "Bağlantıyı Kes",
@@ -164,139 +209,148 @@ class _ControlPageState extends State<ControlPage> {
           ),
           centerTitle: true,
         ),
-        body: Container(
-          // color: Colors.transparent,
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                Color(0xfffde4a9),
-                Color(0xFFdfecea),
-              ])),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 50,
-              ),
-              Image(
-                // TODO
-                image: AssetImage(_isYavas ? randomItem : 'ytu.png'),
-                height: 130, // * change
-                width: 130,
-              ),
-              _doesOtonom
-                  ? Container(
-                      width: deviceWidth,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'Hedefe Gidiliyor',
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black87),
-                          ),
-                          SizedBox(
-                            height: 300,
-                            width: 300,
-                            child: FlareActor("assets/car.flr",
-                                alignment: Alignment.center,
-                                fit: BoxFit.contain,
-                                animation: "play"),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'Anlık Hız: ${(_speed * 55).toInt().toString()}',
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black87),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 30, right: 20, left: 20),
-                            child: SliderTheme(
-                              data: SliderThemeData(
-                                thumbColor: Colors.tealAccent[400],
-                                thumbShape: RoundSliderThumbShape(
-                                    enabledThumbRadius: 15),
-                                // overlayColor: Colors.red
-                                activeTrackColor: Colors.orange,
-                                inactiveTrackColor: Colors.black38,
-                                trackHeight: 15.0,
-                                // showValueIndicator: ShowValueIndicator.onlyForDiscrete
-                              ),
-                              child: Slider(
-                                value: _speed,
-                                min: 0,
-                                max: 2, // TODO bunu 110 yap
-                                label: (_speed * 55).toInt().toString(),
-                                onChanged: (newvalue) {
-                                  setState(() => _speed =
-                                      newvalue); //_speed değiştirmek için slider da
-                                },
-                                divisions: 2,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          JoystickView(
-                            onDirectionChanged: onDirectionChanged,
-                            backgroundColor: Colors.black54,
-                            innerCircleColor: Colors.tealAccent[400],
-                            size: 200,
-                            // interval: Duration(milliseconds: 10),
-                          ),
-                          SizedBox(
-                            height: 40,
-                          ),
-                        ]),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _doesOtonom ? Colors.red : Colors.blue,
-                    padding: EdgeInsets.fromLTRB(80, 14, 80, 14),
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(15.0),
+        body: !havaYet
+            ? Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                      Color(0xfffde4a9),
+                      Color(0xbad1ecea),
+                    ])),
+                child: Center(
+                  child: LoadingJumpingLine.circle(),
+                ))
+            : Container(
+                // color: Colors.transparent,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("assets/arkaplanlar/$_weather.png"),
+                        fit: BoxFit.cover)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: deviceHeight / 17,
                     ),
-                  ),
-                  child: Text(
-                    _doesOtonom ? "DUR" : "OTONOM",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight:
-                            FontWeight.bold), // minWidth: deviceWidth - 40,
-                  ),
-                  onPressed: () {
-                    if (_doesOtonom == false) {
-                      setState(() {
-                        _doesOtonom = true;
-                      });
-                    } else if (_doesOtonom == true) {
-                      moved();
-                      setState(() {
-                        _doesOtonom = false;
-                      });
-                    }
-                  }),
-            ],
-          ),
-        ));
+                    Image(
+                      // TODO
+                      image: AssetImage(_isYavas ? randomItem : 'ytu.png'),
+                      height: deviceHeight / 5, // * change
+                      width: deviceHeight / 5,
+                    ),
+                    _doesOtonom
+                        ? Container(
+                            width: deviceWidth,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: deviceHeight / 40,
+                                ),
+                                Text(
+                                  'Hedefe Gidiliyor',
+                                  style: TextStyle(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black87),
+                                ),
+                                SizedBox(
+                                  height: deviceHeight / 2.4,
+                                  width: deviceHeight / 2.4,
+                                  child: FlareActor("assets/car.flr",
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.contain,
+                                      animation: "play"),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                                SizedBox(
+                                  height: deviceHeight / 40,
+                                ),
+                                Text(
+                                  'Anlık Hız: ${(_speed * 55).toInt().toString()}',
+                                  style: TextStyle(
+                                      fontSize: 35,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black87),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 30, right: 20, left: 20),
+                                  child: SliderTheme(
+                                    data: SliderThemeData(
+                                      thumbColor: Colors.tealAccent[400],
+                                      thumbShape: RoundSliderThumbShape(
+                                          enabledThumbRadius: 15),
+                                      // overlayColor: Colors.red
+                                      activeTrackColor: Colors.orange,
+                                      inactiveTrackColor: Colors.black38,
+                                      trackHeight: 15.0,
+                                      // showValueIndicator: ShowValueIndicator.onlyForDiscrete
+                                    ),
+                                    child: Slider(
+                                      value: _speed,
+                                      min: 0,
+                                      max: 2,
+                                      label: (_speed * 55).toInt().toString(),
+                                      onChanged: (newvalue) {
+                                        setState(() => _speed =
+                                            newvalue); //_speed değiştirmek için slider da
+                                      },
+                                      divisions: 2,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: deviceHeight / 30,
+                                ),
+                                JoystickView(
+                                  onDirectionChanged: onDirectionChanged,
+                                  backgroundColor: Colors.black54,
+                                  innerCircleColor: Colors.tealAccent[400],
+                                  size: deviceHeight / 4,
+                                  // interval: Duration(milliseconds: 10),
+                                ),
+                                SizedBox(
+                                  height: deviceHeight / 15,
+                                ),
+                              ]),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: _doesOtonom ? Colors.red : Colors.blue,
+                          padding: EdgeInsets.fromLTRB(80, 14, 80, 14),
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(15.0),
+                          ),
+                        ),
+                        child: Text(
+                          _doesOtonom ? "DUR" : "OTONOM",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight
+                                  .bold), // minWidth: deviceWidth - 40,
+                        ),
+                        onPressed: () {
+                          if (_doesOtonom == false) {
+                            setState(() {
+                              _doesOtonom = true;
+                            });
+                          } else if (_doesOtonom == true) {
+                            moved();
+                            setState(() {
+                              _doesOtonom = false;
+                            });
+                          }
+                        }),
+                  ],
+                ),
+              ));
   }
 
   void _getdirection(double deg, double dis) async {
