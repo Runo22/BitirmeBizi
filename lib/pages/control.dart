@@ -80,9 +80,19 @@ class _ControlPageState extends State<ControlPage> {
     });
   }
 
-  void checkHava() {
+  void checkHava() { //hava durumundan dolayı yavaşlamayı kontrol eden kod
     var havaList = ['hail', 'heavyrain', 'snow'];
     if (havaList.contains(_weather)) {
+      if (_speed == 2.0) {
+        setState(() {
+          _speed = 1.0;
+        });
+      }
+    }
+  }
+
+  void checkYavas() { // sinyalden dolayı yavaşlama durumunu kontrol eden kod
+    if (_isYavas == true) {
       if (_speed == 2.0) {
         setState(() {
           _speed = 1.0;
@@ -134,33 +144,19 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   void moved() async {
-    //hava durumuna göre hızı yavaşlatma kodu
+    //yavaşlama durumları
     checkHava();
+    checkYavas();
+
     //ELLE KONTROL
     if (_doesOtonom == false) {
-      if (_isYavas == true) {
-        if (_speed != 0.0) {
-          _speed = 1.0;
-        }
-      }
       try {
         response = await http.get(
             url +
                 "update?value=" +
                 "${direction.toString()}${_speed.toInt().toString()}",
             headers: {"Accept": "plain/text"});
-        //https://www.youtube.com/watch?v=8II1VPb-neQ&t=470s&ab_channel=PaulHalliday
-        //burada setstate erkranı yeniletiyo bunu bloc kullanarak yap
         _status = response.body;
-
-        if (_status == "yavas") {
-          randomItem = (durumListesi..shuffle()).first;
-          _isYavas = true;
-          Future.delayed(Duration(seconds: 2), () {
-            _isYavas = false;
-            print("---YAVAS KODU BITTI---");
-          });
-        }
       } catch (e) {
         print(e);
       }
@@ -181,6 +177,15 @@ class _ControlPageState extends State<ControlPage> {
         });
       }
     }
+
+    if (_status == "yavas") {
+          randomItem = (durumListesi..shuffle()).first;
+          _isYavas = true;
+          Future.delayed(Duration(seconds: 2), () {
+            _isYavas = false;
+            print("---YAVAS KODU BITTI---");
+          });
+        }
   }
 
   // @override
@@ -236,17 +241,6 @@ class _ControlPageState extends State<ControlPage> {
                     SizedBox(
                       height: deviceHeight / 30,
                     ),
-                    // Container(     // uyarı yı denemek için
-                    //   padding: EdgeInsets.only(bottom: deviceHeight/30, top: deviceHeight/80),
-                    //   child: Image(
-
-                    //           image:
-                    //               AssetImage((durumListesi..shuffle()).first),//randomItem
-                    //           height: deviceHeight / 5,
-                    //           width: deviceHeight / 5,
-                    //         ),
-                    // ),
-
                     _isYavas
                         ? Container(
                             padding: EdgeInsets.only(
@@ -294,9 +288,6 @@ class _ControlPageState extends State<ControlPage> {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                                // SizedBox(
-                                //   height: deviceHeight / 40,
-                                // ),
                                 Text(
                                   'Anlık Hız: ${(_speed * 55).toInt().toString()}',
                                   style: TextStyle(
@@ -365,6 +356,7 @@ class _ControlPageState extends State<ControlPage> {
                           if (_doesOtonom == false) {
                             setState(() {
                               _doesOtonom = true;
+                              _speed = 2.0;
                             });
                           } else if (_doesOtonom == true) {
                             moved();

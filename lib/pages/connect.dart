@@ -22,7 +22,7 @@ class _ConnectPageState extends State<ConnectPage> {
   TextEditingController _hostController;
   double deviceHeight;
 
-  @override //Gereksiz Silinebilir
+  @override
   void initState() {
     _ipController = new TextEditingController(text: '192.168.1.200');
     _hostController = new TextEditingController(text: '80');
@@ -66,10 +66,6 @@ class _ConnectPageState extends State<ConnectPage> {
   void submit() {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save();
-      // print('Printing the login data.');
-      // print('Email: ${_data.ip}');
-      // print('Password: ${_data.port}');
-      // print(deviceHeight.toString());
     }
   }
 
@@ -98,7 +94,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   image: AssetImage(
                     'ytu.png',
                   ),
-                  height: deviceHeight/3.7, // * change
+                  height: deviceHeight/3.7,
                   width: deviceHeight/3.7,
                 ),
                 SizedBox(
