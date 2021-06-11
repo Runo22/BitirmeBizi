@@ -22,7 +22,8 @@ class _ControlPageState extends State<ControlPage> {
   int direction, lastdiretion = 0;
   Timer _milisectimer;
   Duration twentyMillis;
-  static const milisec = const Duration(milliseconds: 100); //veri gonderme araligi
+  static const milisec =
+      const Duration(milliseconds: 100); //veri gonderme araligi
 
   String _status = 'Not Connected';
   var response, responseOtonom;
@@ -82,8 +83,10 @@ class _ControlPageState extends State<ControlPage> {
   void checkHava() {
     var havaList = ['hail', 'heavyrain', 'snow'];
     if (havaList.contains(_weather)) {
-      if (_speed != 0.0) {
-        _speed = 1.0;
+      if (_speed == 2.0) {
+        setState(() {
+          _speed = 1.0;
+        });
       }
     }
   }
@@ -114,7 +117,6 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   void premoved() {
-    //? buna gerek olmayabilir(yukarda tanımlı bool)
     if (direction == lastdiretion) {
       sameDirection = true;
     } else {
@@ -232,14 +234,40 @@ class _ControlPageState extends State<ControlPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(
-                      height: deviceHeight / 17,
+                      height: deviceHeight / 30,
                     ),
-                    Image(
-                      // TODO
-                      image: AssetImage(_isYavas ? randomItem : 'ytu.png'),
-                      height: deviceHeight / 5, // * change
-                      width: deviceHeight / 5,
-                    ),
+                    // Container(     // uyarı yı denemek için
+                    //   padding: EdgeInsets.only(bottom: deviceHeight/30, top: deviceHeight/80),
+                    //   child: Image(
+
+                    //           image:
+                    //               AssetImage((durumListesi..shuffle()).first),//randomItem
+                    //           height: deviceHeight / 5,
+                    //           width: deviceHeight / 5,
+                    //         ),
+                    // ),
+
+                    _isYavas
+                        ? Container(
+                            padding: EdgeInsets.only(
+                                bottom: deviceHeight / 30,
+                                top: deviceHeight / 80),
+                            child: Image(
+                              image: AssetImage(
+                                  (durumListesi..shuffle()).first), //randomItem
+                              height: deviceHeight / 5,
+                              width: deviceHeight / 5,
+                            ),
+                          )
+                        : SizedBox(
+                            height: deviceHeight / 4,
+                            width: deviceHeight / 3.5,
+                            child: FlareActor("assets/car.flr",
+                                alignment: Alignment.center,
+                                fit: BoxFit.contain,
+                                animation: "play"),
+                          ),
+
                     _doesOtonom
                         ? Container(
                             width: deviceWidth,
@@ -255,13 +283,10 @@ class _ControlPageState extends State<ControlPage> {
                                       fontWeight: FontWeight.w800,
                                       color: Colors.black87),
                                 ),
-                                SizedBox(
+                                Image(
+                                  image: AssetImage('otonom.gif'),
                                   height: deviceHeight / 2.4,
                                   width: deviceHeight / 2.4,
-                                  child: FlareActor("assets/car.flr",
-                                      alignment: Alignment.center,
-                                      fit: BoxFit.contain,
-                                      animation: "play"),
                                 ),
                               ],
                             ),
@@ -269,9 +294,9 @@ class _ControlPageState extends State<ControlPage> {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                                SizedBox(
-                                  height: deviceHeight / 40,
-                                ),
+                                // SizedBox(
+                                //   height: deviceHeight / 40,
+                                // ),
                                 Text(
                                   'Anlık Hız: ${(_speed * 55).toInt().toString()}',
                                   style: TextStyle(
