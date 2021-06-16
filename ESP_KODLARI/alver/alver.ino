@@ -20,12 +20,6 @@ ESP8266WebServer server(80);
 String  resp;
 bool isYavas = false;
 
-
-//void handleRoot()   //TODO DEL:GEREKSİZ SANIRIM
-//{
-//    server.send(200, "text/html", "You are connected");
-//}
-
 void setup() {
   Serial.begin(9600);
   SPI.begin();
@@ -42,7 +36,6 @@ void setup() {
   server.on("/update", handle);
   server.on("/otonom", handleOtonom);
   server.begin();
-  //Serial.println("HTTP server started");  //TEST amaçlı
 }
 
 void handle(){
@@ -53,8 +46,7 @@ void handle(){
     server.send(200,"text/plain","CONNECTED"); 
   }
   resp = server.arg("value");
-  //veri = resp.substring(0,2).toInt();
-  Serial.print(resp + "*");                   // * = 42 ascii
+  Serial.print(resp + "*");   // * = 42 ascii
 }
 
 void handleOtonom(){
@@ -65,13 +57,15 @@ void handleOtonom(){
       //otonom iş bitince bu alttaki gidicek
       server.send(200,"text/plain","ELLE");
     }
+    else if(isYavas == true){
+    server.send(200,"text/plain","yavas");
+    isYavas == false;
+  }
     else{
       server.send(200,"text/plain","CONNECTED");
     }
   }
-  delay(1);   //??????
 }
-
 
 void loop() {
   readKey();
@@ -80,26 +74,19 @@ void loop() {
 
 void readKey(){
   
-   if(! rfid.PICC_IsNewCardPresent()){
-       return;
-    }
-   if(! rfid.PICC_ReadCardSerial()){
-       return;
-    }
-   if(rfid.uid.uidByte[0] == ID[0] &&
-   rfid.uid.uidByte[1] == ID[1] &&
-   rfid.uid.uidByte[2] == ID[2] &&
-   rfid.uid.uidByte[3] == ID[3]){
-    //okuduğu zaman listeden random durum seçip uygulmaaya gönderilecek.
-//    Serial.println("YAVAŞ!!!");
-    //burdan uygulamay veri gönderilecek 
-    //uygulmadan t sniye boyunca hız 1 olacak
-    //ve yavaşla işareti çıkacak
-    isYavas = true;
-    }
-//   else{
-//    Serial.print("Yetkisiz KART!!!");
-//    }   
-   rfid.PICC_HaltA();
+  if(! rfid.PICC_IsNewCardPresent()){
+      return;
   }
+  if(! rfid.PICC_ReadCardSerial()){
+      return;
+  }
+  if(rfid.uid.uidByte[0] == ID[0] &&
+  rfid.uid.uidByte[1] == ID[1] &&
+  rfid.uid.uidByte[2] == ID[2] &&
+  rfid.uid.uidByte[3] == ID[3]){
+
+  isYavas = true;
+  }
+  rfid.PICC_HaltA();
+}
   

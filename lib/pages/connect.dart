@@ -1,3 +1,4 @@
+import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:esp_control/pages/control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,6 +11,7 @@ class ConnectPage extends StatefulWidget {
 class IPData {
   String ip = '';
   String port = '';
+  String sehir = '';
 }
 
 class _ConnectPageState extends State<ConnectPage> {
@@ -20,9 +22,9 @@ class _ConnectPageState extends State<ConnectPage> {
   TextEditingController _hostController;
   double deviceHeight;
 
-  @override //Gereksiz Silinebilir
+  @override
   void initState() {
-    _ipController = new TextEditingController(text: '192.97.1.200');
+    _ipController = new TextEditingController(text: '192.168.1.200');
     _hostController = new TextEditingController(text: '80');
     super.initState();
   }
@@ -64,10 +66,6 @@ class _ConnectPageState extends State<ConnectPage> {
   void submit() {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save();
-      // print('Printing the login data.');
-      // print('Email: ${_data.ip}');
-      // print('Password: ${_data.port}');
-      // print(deviceHeight.toString());
     }
   }
 
@@ -78,7 +76,7 @@ class _ConnectPageState extends State<ConnectPage> {
       //klavye açılınca overflow olmasın diye
       resizeToAvoidBottomInset: false,
       body: Container(
-        padding: EdgeInsets.only(top: deviceHeight/6.5, left: 45, right: 45),
+        padding: EdgeInsets.only(top: deviceHeight/8.5, left: 45, right: 45),
         // color: Colors.amber[200],
         decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -96,11 +94,11 @@ class _ConnectPageState extends State<ConnectPage> {
                   image: AssetImage(
                     'ytu.png',
                   ),
-                  height: deviceHeight/3.7, // * change
+                  height: deviceHeight/3.7,
                   width: deviceHeight/3.7,
                 ),
                 SizedBox(
-                  height: deviceHeight/18,
+                  height: deviceHeight/25,
                 ),
                 TextFormField(
                     controller: _ipController,
@@ -121,12 +119,13 @@ class _ConnectPageState extends State<ConnectPage> {
                     validator: this._validateIP,
                     onSaved: (String value) {
                       this._data.ip = value;
-                      print(_data.ip + ":" + _data.port);
+                      print(_data.ip + ":" + _data.port + 'sehir:' + _data.sehir);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (BuildContext context) => ControlPage(
                                     furl: this._data.ip + ":" + this._data.port,
+                                    ssehir: this._data.sehir,
                                   )));
                     }),
                 SizedBox(
@@ -151,8 +150,62 @@ class _ConnectPageState extends State<ConnectPage> {
                       this._data.port = value;
                     }),
                 SizedBox(
-                  height: deviceHeight/9.5,
+                  height: deviceHeight/43,
                 ),
+                
+                DropDownFormField(
+                  titleText: 'Şehirler',
+                  hintText: 'Şehir seçin',
+                  value: this._data.sehir,
+                  onSaved: (value) {
+                    setState(() {
+                      this._data.sehir = value;
+                    });
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      this._data.sehir = value;
+                    });
+                  },
+                  dataSource: [
+                    {
+                      "display": "İstanbul",
+                      "value": "istanbul",
+                    },
+                    {
+                      "display": "Ankara",
+                      "value": "ankara",
+                    },
+                    {
+                      "display": "Londra",
+                      "value": "london",
+                    },
+                    {
+                      "display": "Paris",
+                      "value": "paris",
+                    },
+                    {
+                      "display": "New York",
+                      "value": "new york",
+                    },
+                    {
+                      "display": "Moskova",
+                      "value": "moscow",
+                    },
+                    {
+                      "display": "Anchorage",
+                      "value": "anchorage",
+                    },
+                  ],
+                  textField: 'display',
+                  valueField: 'value',
+                  filled: true,
+                  
+                ),
+                SizedBox(
+                  height: deviceHeight/10,
+                ),
+
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.fromLTRB(80, 15, 80, 15),

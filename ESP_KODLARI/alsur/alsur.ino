@@ -1,8 +1,8 @@
-// Motor A connections
+// Motor A
 #define enA 9
 #define in1 8
 #define in2 7
-// Motor B connections
+// Motor B
 #define enB 3
 #define in3 5
 #define in4 4
@@ -37,7 +37,6 @@ void setup() {
   pinMode(trigPin,OUTPUT);
 }
 
-
 void loop() { 
   if(Serial.available() > 0){
     gelen = Serial.read();
@@ -46,8 +45,8 @@ void loop() {
     if(gelen == "42"){  // 42 => * 
       yon = data.substring(0,2);
       hiz = data.substring(2,4).toInt();
-      Serial.print(yon);
-      Serial.print(hiz);
+      // Serial.print(yon);
+      // Serial.print(hiz);
       data = "";
       }
     else if(gelen == "79"){
@@ -55,46 +54,31 @@ void loop() {
     }
   }
 
-
    //ELLE SURUS KODLARI
   if(doesOtonom == false){
     checkSpeed();
     if(yon == "48"){
-      Serial.print("dur - ");
-      Serial.println(hiz);
       dur();
     }
     else if(yon == "49"){
-      Serial.print("ileri - ");
-      Serial.println(hiz);
       ileri();
     }
     
     else if(yon == "50"){
-      Serial.print("sol - ");
-      Serial.println(hiz);
       sol();
     }
     else if(yon == "51"){
-      Serial.print("geri - ");
-      Serial.println(hiz);
       geri();
     }
     
     else if(yon == "52"){
-      Serial.print("sag - ");
-      Serial.println(hiz);
       sag();
     }
-//    else{
-//      Serial.print("Sokacam calıs");
-//      dur();
-//    }
   }
 
   // OTONOM SURUS KODLARI
     else if(doesOtonom == true){
-      //uzaklık sensoru olçum
+      //uzaklık sensoru olcum
       digitalWrite(trigPin, LOW);
       delayMicroseconds(5);
       digitalWrite(trigPin,HIGH);
@@ -104,7 +88,7 @@ void loop() {
       sure = pulseIn(echoPin, HIGH);
       uzaklik = sure / 29.1 / 2;
     
-      if(uzaklik < 15)    //TODO 
+      if(uzaklik < 15)
       {
         geri();
         delay(500);
@@ -114,7 +98,7 @@ void loop() {
           delay(500);
           sagSol = 0;
           doesOtonom = false;
-          Serial.print("M");
+          Serial.print("M"); // manuele gecmek icin
         }
         else{
           sag();
@@ -126,10 +110,7 @@ void loop() {
         ileri();
       }
     } 
-    Serial.println("Gitti galiba");
 }
-
-
 
 //MOTOR kontrol kodları
 void dur(){
@@ -146,7 +127,7 @@ void ileri(){
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
 }
-void geri(){                //Geri hizi sabit bir değere atanabilir.
+void geri(){
   analogWrite(enA, hiz);
   analogWrite(enB, hiz);
   digitalWrite(in1, LOW);
@@ -154,7 +135,7 @@ void geri(){                //Geri hizi sabit bir değere atanabilir.
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
 }
-void sol(){                 //Duruma göre 0 hiz yapılıp a motorun dönme yönü ters çevrilir.
+void sol(){
   analogWrite(enA, 0);
   analogWrite(enB, hiz);
   digitalWrite(in1, LOW);
